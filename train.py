@@ -34,6 +34,7 @@ def setup_training_loop_kwargs(
     gpus       = None, # Number of GPUs: <int>, default = 1 gpu
     snap       = None, # Snapshot interval: <int>, default = 50 ticks
     metrics    = None, # List of metric names: [], ['fid50k_full'] (default), ...
+    metrics_path= None, # Dir to run metrics against
     seed       = None, # Random seed: <int>, default = 0
 
     # Dataset.
@@ -92,6 +93,11 @@ def setup_training_loop_kwargs(
     if not all(metric_main.is_valid_metric(metric) for metric in metrics):
         raise UserError('\n'.join(['--metrics can only contain the following values:'] + metric_main.list_valid_metrics()))
     args.metrics = metrics
+
+    if metrics_path is not None:
+        args.metrics_path = metrics_path
+    else:
+        args.metrics_path = data
 
     if seed is None:
         seed = 0
@@ -403,6 +409,7 @@ class CommaSeparatedList(click.ParamType):
 @click.option('--gpus', help='Number of GPUs to use [default: 1]', type=int, metavar='INT')
 @click.option('--snap', help='Snapshot interval [default: 50 ticks]', type=int, metavar='INT')
 @click.option('--metrics', help='Comma-separated list or "none" [default: fid50k_full]', type=CommaSeparatedList())
+@click.option('--metrics-path', help='Dataset to run metrics against', type=str, metavar='DIR')
 @click.option('--seed', help='Random seed [default: 0]', type=int, metavar='INT')
 @click.option('-n', '--dry-run', help='Print training options and exit', is_flag=True)
 
